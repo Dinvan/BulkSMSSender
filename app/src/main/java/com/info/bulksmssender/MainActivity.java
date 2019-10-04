@@ -18,6 +18,7 @@ import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -25,7 +26,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.PowerManager;
 import android.telephony.SmsManager;
-import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ArrayAdapter;
@@ -60,7 +60,6 @@ public class MainActivity extends AppCompatActivity {
     PendingIntent sentPI;
     protected PowerManager.WakeLock mWakeLock;
     public static int limit = 95, pause = 3;
-    private Runnable runnableCode;
     Handler handler;
     ProgressDialog progressBar;
     ArrayList<String> numbers = new ArrayList<>();
@@ -80,6 +79,12 @@ public class MainActivity extends AppCompatActivity {
         progressBar.setMessage("SMS Sending...");
         progressBar.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
         progressBar.setProgress(0);
+        progressBar.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialogInterface) {
+
+            }
+        });
 
         final PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
         this.mWakeLock = pm.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, "Sender::MyWakelockTag");
@@ -144,7 +149,7 @@ public class MainActivity extends AppCompatActivity {
         broadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context arg0, Intent arg1) {
-                i++;
+
                 PreferenceHelper.setSharedPreferenceInt(MainActivity.this, PreferenceHelper.LAST_INDEX, i);
 
                 switch (getResultCode()) {
@@ -191,18 +196,20 @@ public class MainActivity extends AppCompatActivity {
                         txtLastIndex.setText("Last Index: "+i);
 
                         if (i < numbers.size()) {
+                            progressBar.setMessage("SMS Sending To :" +numbersToDisplay.get(i));
                             progressBar.setProgress(i);
                             sendIt();
                         } else {
                             progressBar.dismiss();
-                            Toast.makeText(getBaseContext(), "All SMS Sent", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getBaseContext(), "All SMS Sent,Click On Reset Button to Resend", Toast.LENGTH_SHORT).show();
                             t.cancel();
                         }
+                        i++;
                     }
                 });
             }
 
-        }, 0, 5000);
+        }, 1000, 5000);
     }
 
     void sendIt() {

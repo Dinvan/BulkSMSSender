@@ -6,7 +6,7 @@ import java.util.concurrent.TimeUnit;
 
 public class APIClient {
 
-    public static String BASE_URL_DEV  = "http://350.1991.101.194:9089/";
+    public static String BASE_URL_DEV  = "http://35.1199.11.1994:8080/";
     public static APIInterface getAPIInterface() {
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
                 .connectTimeout(1, TimeUnit.MINUTES)
